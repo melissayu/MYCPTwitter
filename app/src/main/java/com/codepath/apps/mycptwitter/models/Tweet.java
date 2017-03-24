@@ -1,10 +1,16 @@
 package com.codepath.apps.mycptwitter.models;
 
+import android.net.ParseException;
+import android.text.format.DateUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by melissa on 3/21/17.
@@ -14,12 +20,14 @@ import java.util.ArrayList;
 
 //parse the json and store the data,
 //state logic or display logic
+@Parcel
 public class Tweet {
 
-    private String body;
-    private long uid; //Id of the tweet
-    private User user;
-    private String createdAt;
+    String body;
+    long uid; //Id of the tweet
+    User user;
+    String createdAt;
+    String relativeTimestamp;
 
     public User getUser() {
         return user;
@@ -37,6 +45,14 @@ public class Tweet {
         return createdAt;
     }
 
+    public String getRelativeTimestamp() {
+        return relativeTimestamp;
+    }
+
+    // empty constructor needed by the Parceler library
+    public Tweet() {
+    }
+
     //Deserialize the JSON
     //Tweet.fromJSON("{...}") ==> Tweet
     public static Tweet fromJSON(JSONObject jsonObject){
@@ -48,8 +64,11 @@ public class Tweet {
             tweet.uid = jsonObject.getLong("id");
             tweet.createdAt = jsonObject.getString("created_at");
             tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
+            tweet.relativeTimestamp = getRelativeTimeAgo(tweet.createdAt);
 
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
 
@@ -75,6 +94,24 @@ public class Tweet {
         }
 
         return tweets;
+    }
+
+    // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
+    public static String getRelativeTimeAgo(String rawJsonDate) throws java.text.ParseException {
+        String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+        SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
+        sf.setLenient(true);
+
+        String relativeDate = "";
+        try {
+            long dateMillis = sf.parse(rawJsonDate).getTime();
+            relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return relativeDate;
     }
 }
 

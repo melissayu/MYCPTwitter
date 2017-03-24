@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.codepath.apps.mycptwitter.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -14,12 +15,14 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
 public class TimelineActivity extends AppCompatActivity {
+    private final int REQUEST_CODE = 20;
 
     private TwitterClient client;
     private TweetsArrayAdapter aTweets;
@@ -79,7 +82,7 @@ public class TimelineActivity extends AppCompatActivity {
 
     private void goToCompose(){
         Intent i = new Intent(this, ComposeActivity.class);
-        startActivity(i);
+        startActivityForResult(i, REQUEST_CODE);
     }
 
     //send api request and fill listview by creating tweet objects from json
@@ -111,6 +114,29 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.d("DEBUG", errorResponse.toString());
 //                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.d("DEBUG", errorResponse.toString());
+//                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
         });
+    }
+
+    // ActivityOne.java, time to handle the result of the sub-activity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+//            String newTweet = data.getExtras().getString("tweet"); //TODO: get tweet object and add to adapter.
+            Tweet newTweet = (Tweet) Parcels.unwrap(data.getParcelableExtra("tweet"));
+            aTweets.insert(newTweet,0);
+            aTweets.notifyDataSetChanged();
+
+//            int code = data.getExtras().getInt("code", 0);
+            // Toast the name to display temporarily on screen
+            Toast.makeText(this, newTweet.getBody(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -2,16 +2,17 @@ package com.codepath.apps.mycptwitter.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 /**
  * Created by melissa on 3/21/17.
  */
-
+@Parcel
 public class User {
 
-    private String name;
-    private String screenName;
-    private String profileImageUrl;
+    String name;
+    String screenName;
+    String profileImageUrl;
 
     public String getName() {
         return name;
