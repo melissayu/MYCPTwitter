@@ -1,15 +1,29 @@
-package com.codepath.apps.mycptwitter;
+package com.codepath.apps.mycptwitter.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codepath.apps.mycptwitter.EndlessScrollListener;
+import com.codepath.apps.mycptwitter.R;
+import com.codepath.apps.mycptwitter.TweetsArrayAdapter;
+import com.codepath.apps.mycptwitter.TwitterApplication;
+import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
 import com.codepath.apps.mycptwitter.models.Tweet_Table;
 import com.codepath.apps.mycptwitter.models.User;
@@ -45,6 +59,10 @@ public class TimelineActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_twitter_white);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
@@ -77,6 +95,18 @@ public class TimelineActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        lvTweets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Tweet selectedTweet = tweets.get(position);
+                Intent i = new Intent(getApplicationContext(), TweetDetailActivity.class);
+                i.putExtra("tweet", Parcels.wrap(selectedTweet));
+                startActivity(i);
+
+            }
+        });
+
         client = TwitterApplication.getRestClient(); //singleton client
         firstLoad = true;
         populateTimeline();
@@ -109,8 +139,76 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     private void goToCompose(){
-        Intent i = new Intent(this, ComposeActivity.class);
-        startActivityForResult(i, REQUEST_CODE);
+//        Intent i = new Intent(this, ComposeActivity.class);
+//        startActivityForResult(i, REQUEST_CODE);
+        final Dialog dialog = new Dialog(TimelineActivity.this);
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
+        dialog.setContentView(R.layout.dialog_compose);
+        dialog.setTitle("Compose new Tweet");
+
+        final TextView tvCharCount = (TextView) dialog.findViewById(R.id.tvCharCountDialog);
+
+        final EditText etTweet = (EditText) dialog.findViewById(R.id.etTweetBodyDialog);
+        etTweet.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int charCount = 140-s.length();
+                tvCharCount.setText(Integer.toString(charCount));
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        Button btnPost = (Button) dialog.findViewById(R.id.btnSaveDialog);
+        btnPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tweetBody = etTweet.getText().toString();
+                postTweet(tweetBody);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void postTweet(String tweetBody){
+        client.postTweet(tweetBody, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+//                super.onSuccess(statusCode, headers, response);
+
+                Log.d("DEBUG", response.toString());
+
+                Tweet newTweet = Tweet.fromJSON(response);
+
+                //add newTweet to list
+                aTweets.insert(newTweet,0);
+                aTweets.notifyDataSetChanged();
+
+                //persist new tweet
+                newTweet.save();
+
+                finish(); // closes the activity, pass data to parent
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                Log.d("DEBUG", errorResponse.toString());
+
+//                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
     }
 
     private void persistTweets(ArrayList<Tweet> fetchedTweets) {

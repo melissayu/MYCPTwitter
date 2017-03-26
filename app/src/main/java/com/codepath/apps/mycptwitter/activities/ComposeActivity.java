@@ -1,4 +1,4 @@
-package com.codepath.apps.mycptwitter;
+package com.codepath.apps.mycptwitter.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.codepath.apps.mycptwitter.R;
+import com.codepath.apps.mycptwitter.TwitterApplication;
+import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
