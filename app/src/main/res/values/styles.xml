@@ -10,7 +10,15 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="TwitterTheme" parent="AppBaseTheme">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>

@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:descendantFocusability="blocksDescendants"
     android:padding="5dp">
 
     <ImageView
@@ -19,25 +21,25 @@
         android:id="@+id/tvUserNameCompose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/ivProfileImage"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:text="Name" />
 
-    <TextView
+    <com.codepath.apps.mycptwitter.LinkifiedTextView
         android:id="@+id/tvBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/tvUserNameCompose"
         android:layout_toRightOf="@+id/ivProfileImage"
+        android:autoLink="all"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:linksClickable="true"
+        android:text="Name" />
 
     <TextView
         android:id="@+id/tvTimestamp"

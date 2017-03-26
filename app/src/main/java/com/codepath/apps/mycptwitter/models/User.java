@@ -1,5 +1,10 @@
 package com.codepath.apps.mycptwitter.models;
 
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
@@ -7,11 +12,21 @@ import org.parceler.Parcel;
 /**
  * Created by melissa on 3/21/17.
  */
-@Parcel
-public class User {
+@Parcel(analyze={User.class})
+@Table(database = MyDatabase.class)
+public class User extends BaseModel {
 
+    @Column
+    @PrimaryKey
+    public long uid;
+
+    @Column
     String name;
+
+    @Column
     String screenName;
+
+    @Column
     String profileImageUrl;
 
     public String getName() {
@@ -30,14 +45,12 @@ public class User {
         return uid;
     }
 
-    private long uid;
-
     public static User fromJSON(JSONObject jsonObject){
         User user = new User();
 
         try {
             user.name = jsonObject.getString("name");
-            user.screenName = jsonObject.getString("screen_name");
+            user.screenName = "@"+jsonObject.getString("screen_name");
             user.profileImageUrl = jsonObject.getString("profile_image_url");
             user.uid = jsonObject.getLong("id");
         } catch (JSONException e) {

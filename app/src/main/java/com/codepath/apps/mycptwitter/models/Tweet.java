@@ -3,6 +3,12 @@ package com.codepath.apps.mycptwitter.models;
 import android.net.ParseException;
 import android.text.format.DateUtils;
 
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,14 +26,28 @@ import java.util.Locale;
 
 //parse the json and store the data,
 //state logic or display logic
-@Parcel
-public class Tweet {
+@Parcel(analyze={Tweet.class})
+@Table(database = MyDatabase.class)
+public class Tweet extends BaseModel {
 
+    @Column
     String body;
+
+    @Column
+    @PrimaryKey
     long uid; //Id of the tweet
+
+    @Column
+    @ForeignKey(saveForeignKeyModel = true)
     User user;
+
+    @Column
     String createdAt;
+
+    @Column
     String relativeTimestamp;
+
+    String mediaImageUrl;
 
     public User getUser() {
         return user;
@@ -49,6 +69,8 @@ public class Tweet {
         return relativeTimestamp;
     }
 
+    public String getMediaImageUrl() { return mediaImageUrl; }
+
     // empty constructor needed by the Parceler library
     public Tweet() {
     }
@@ -65,6 +87,18 @@ public class Tweet {
             tweet.createdAt = jsonObject.getString("created_at");
             tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
             tweet.relativeTimestamp = getRelativeTimeAgo(tweet.createdAt);
+
+            JSONObject entities = jsonObject.getJSONObject("entities");
+            JSONArray media = entities.getJSONArray("media");
+            if (media != null) {
+                for (int i = 0; i<media.length(); i++) {
+                    String mediaType = media.getJSONObject(i).getString("type");
+                    if (mediaType.equals("photo")) {
+                        tweet.mediaImageUrl = media.getJSONObject(i).getString("media_url");
+                    }
+                }
+                //get photo url
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

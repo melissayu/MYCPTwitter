@@ -3,10 +3,13 @@ package com.codepath.apps.mycptwitter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.codepath.apps.mycptwitter.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -29,6 +32,8 @@ public class ComposeActivity extends AppCompatActivity {
 
         client = TwitterApplication.getRestClient(); //singleton client
 
+        final TextView tvCharCount = (TextView) findViewById(R.id.tvCharacterCount);
+
         Button btnCancel = (Button) findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +52,24 @@ public class ComposeActivity extends AppCompatActivity {
         });
 
         etTweet = (EditText) findViewById(R.id.etTweetBodyCompose);
+        etTweet.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int charCount = 140-s.length();
+                tvCharCount.setText(Integer.toString(charCount));
+//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
     }
 

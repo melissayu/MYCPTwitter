@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E5F3EC"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/etTweetBodyDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView2"
+        android:layout_margin="15dp"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:gravity="top"
+        android:hint="What's happening?"
+        android:inputType="textMultiLine"
+        android:minLines="4"
+        android:padding="10dp"
+        android:textColorHint="?attr/colorButtonNormal"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnSaveDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/etTweetBodyDialog"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="15dp"
+        android:background="#309A64"
+        android:text="Tweet"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tvCharCountDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etTweetBodyDialog"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="12dp"
+        android:layout_toLeftOf="@+id/btnSaveDialog"
+        android:text="140"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Compose new Tweet"
+        android:textSize="18sp" />
+</RelativeLayout>
