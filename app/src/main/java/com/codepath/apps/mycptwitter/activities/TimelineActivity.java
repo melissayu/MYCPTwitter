@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.codepath.apps.mycptwitter.EndlessScrollListener;
 import com.codepath.apps.mycptwitter.R;
@@ -51,6 +50,7 @@ public class TimelineActivity extends AppCompatActivity {
     long maxId;
     boolean firstLoad;
     boolean refreshAll;
+    Dialog dialog;
 
     private SwipeRefreshLayout swipeContainer;
 
@@ -69,6 +69,13 @@ public class TimelineActivity extends AppCompatActivity {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                //delete all tweets in db
+                List<Tweet> dbTweets = SQLite.select()
+                        .from(Tweet.class)
+                        .queryList();
+                for (int i=0; i< dbTweets.size(); i++) {
+                    dbTweets.get(i).delete();
+                }
                 firstLoad = false;
                 refreshAll = true;
                 populateTimeline();
@@ -91,8 +98,9 @@ public class TimelineActivity extends AppCompatActivity {
         lvTweets.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-                loadNextDataFromApi(page);
-                return false;
+                populateTimeline();
+//                loadNextDataFromApi(page);
+                return true;
             }
         });
 
@@ -102,19 +110,20 @@ public class TimelineActivity extends AppCompatActivity {
                 Tweet selectedTweet = tweets.get(position);
                 Intent i = new Intent(getApplicationContext(), TweetDetailActivity.class);
                 i.putExtra("tweet", Parcels.wrap(selectedTweet));
-                startActivity(i);
+                startActivityForResult(i, REQUEST_CODE);
 
             }
         });
 
         client = TwitterApplication.getRestClient(); //singleton client
         firstLoad = true;
+        refreshAll = true;
         populateTimeline();
     }
 
-    public void loadNextDataFromApi(int offset) {
-        populateTimeline();
-    }
+//    public void loadNextDataFromApi(int offset) {
+//        populateTimeline();
+//    }
 
 
     @Override
@@ -141,7 +150,7 @@ public class TimelineActivity extends AppCompatActivity {
     private void goToCompose(){
 //        Intent i = new Intent(this, ComposeActivity.class);
 //        startActivityForResult(i, REQUEST_CODE);
-        final Dialog dialog = new Dialog(TimelineActivity.this);
+        dialog = new Dialog(TimelineActivity.this);
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
         dialog.setContentView(R.layout.dialog_compose);
@@ -174,11 +183,16 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String tweetBody = etTweet.getText().toString();
-                postTweet(tweetBody);
+                postNewTweet(tweetBody);
             }
         });
 
         dialog.show();
+    }
+
+    private void postNewTweet(String tweetBody) {
+        dialog.dismiss();
+        postTweet(tweetBody);
     }
 
     private void postTweet(String tweetBody){
@@ -197,8 +211,8 @@ public class TimelineActivity extends AppCompatActivity {
 
                 //persist new tweet
                 newTweet.save();
-
-                finish(); // closes the activity, pass data to parent
+                lvTweets.setSelectionAfterHeaderView();
+//                finish(); // closes the activity, pass data to parent
 
             }
 
@@ -226,62 +240,67 @@ public class TimelineActivity extends AppCompatActivity {
         if (firstLoad) {
             List<Tweet> dbTweets = SQLite.select()
                     .from(Tweet.class)
-                    .orderBy(Tweet_Table.createdAt, false)
+                    .orderBy(Tweet_Table.uid, false)
                     .queryList();
-            aTweets.addAll(dbTweets);
-            firstLoad = false;
+            if (dbTweets.size() > 0) {
+                aTweets.addAll(dbTweets);
+                firstLoad = false;
+                refreshAll = false;
+                maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
+                return;
+            }
         }
-        else {
 
-            client.getHomeTimeline(refreshAll, maxId, new JsonHttpResponseHandler() {
-                //success
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                    Log.d("DEBUG", response.toString());
+        client.getHomeTimeline(refreshAll, maxId, new JsonHttpResponseHandler() {
+            //success
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.d("DEBUG", response.toString());
 //                super.onSuccess(statusCode, headers, response);
 
-                    if (refreshAll) {
-                        aTweets.clear();
-                    }
-
-                    int responseLength = response.length() - 1;
-                    try {
-                        JSONObject lastObj = response.getJSONObject(responseLength);
-                        maxId = lastObj.getLong("id") - 1;
-                        refreshAll = false;
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    //deserialize json
-                    //create models
-                    //load model data into listview
-                    ArrayList<Tweet> fetchedTweets = Tweet.fromJSONArray(response);
-                    aTweets.addAll(fetchedTweets);
-
-                    //Persist tweets in db
-                    persistTweets(fetchedTweets);
-
-
-                    swipeContainer.setRefreshing(false);
-
+                if (refreshAll) {
+                    aTweets.clear();
                 }
 
-                //failure
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    Log.d("DEBUG", errorResponse.toString());
+                int responseLength = response.length() - 1;
+                try {
+                    JSONObject lastObj = response.getJSONObject(responseLength);
+                    maxId = lastObj.getLong("id") - 1;
+                    refreshAll = false;
+                    firstLoad = false;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //deserialize json
+                //create models
+                //load model data into listview
+                ArrayList<Tweet> fetchedTweets = Tweet.fromJSONArray(response);
+                aTweets.addAll(fetchedTweets);
+
+                //Persist tweets in db
+                persistTweets(fetchedTweets);
+
+
+                swipeContainer.setRefreshing(false);
+
+            }
+
+            //failure
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                Log.d("DEBUG", errorResponse.toString());
 //                super.onFailure(statusCode, headers, throwable, errorResponse);
-                }
+            }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    Log.d("DEBUG", errorResponse.toString());
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.d("DEBUG", errorResponse.toString());
 //                super.onFailure(statusCode, headers, throwable, errorResponse);
-                }
-            });
-        }
+            }
+        });
     }
+
 
     // ActivityOne.java, time to handle the result of the sub-activity
     @Override
@@ -290,16 +309,19 @@ public class TimelineActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             // Extract name value from result extras
 //            String newTweet = data.getExtras().getString("tweet"); //TODO: get tweet object and add to adapter.
-            Tweet newTweet = (Tweet) Parcels.unwrap(data.getParcelableExtra("tweet"));
-            aTweets.insert(newTweet,0);
-            aTweets.notifyDataSetChanged();
+//            Tweet newTweet = (Tweet) Parcels.unwrap(data.getParcelableExtra("tweet"));
+//            aTweets.insert(newTweet,0);
+//            aTweets.notifyDataSetChanged();
+
+            String tweetBody = data.getExtras().getString("tweetBody");
+            postTweet(tweetBody);
 
             //persist new tweet
-            newTweet.save();
+//            newTweet.save();
 
 //            int code = data.getExtras().getInt("code", 0);
             // Toast the name to display temporarily on screen
-            Toast.makeText(this, newTweet.getBody(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, newTweet.getBody(), Toast.LENGTH_SHORT).show();
         }
     }
 }

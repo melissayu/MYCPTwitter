@@ -4,34 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="10dp"
     tools:context="com.codepath.apps.mycptwitter.activities.TweetDetailActivity">
 
     <ImageView
         android:id="@+id/ivProfileImageDetail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
         app:srcCompat="@drawable/ic_launcher" />
 
     <TextView
         android:id="@+id/tvNameDetail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/ivProfileImageDetail"
+        android:text="Name"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_above="@+id/tvUserNameDetail"
         android:layout_toRightOf="@+id/ivProfileImageDetail"
-        android:text="Name" />
+        android:layout_toEndOf="@+id/ivProfileImageDetail" />
 
     <TextView
         android:id="@+id/tvUserNameDetail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/tvNameDetail"
-        android:layout_toRightOf="@+id/tvNameDetail"
-        android:text="Username" />
+        android:text="Username"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:layout_above="@+id/tvTweetBodyDetail"
+        android:layout_toRightOf="@+id/ivProfileImageDetail"
+        android:layout_toEndOf="@+id/ivProfileImageDetail" />
 
     <TextView
         android:id="@+id/tvTweetBodyDetail"
@@ -44,7 +51,10 @@
         android:layout_below="@+id/ivProfileImageDetail"
         android:autoLink="all"
         android:linksClickable="true"
-        android:text="Tweet body" />
+        android:padding="15dp"
+        android:text="Tweet body"
+        android:textColor="@android:color/black"
+        android:textSize="20dp" />
 
     <ImageView
         android:id="@+id/ivMediaImageDetail"

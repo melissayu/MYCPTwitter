@@ -89,17 +89,20 @@ public class Tweet extends BaseModel {
             tweet.relativeTimestamp = getRelativeTimeAgo(tweet.createdAt);
 
             JSONObject entities = jsonObject.getJSONObject("entities");
-            JSONArray media = entities.getJSONArray("media");
-            if (media != null) {
-                for (int i = 0; i<media.length(); i++) {
-                    String mediaType = media.getJSONObject(i).getString("type");
-                    if (mediaType.equals("photo")) {
-                        tweet.mediaImageUrl = media.getJSONObject(i).getString("media_url");
+            if (entities.has("media")) {
+                JSONArray media = entities.getJSONArray("media");
+                if (media != null) {
+                    for (int i = 0; i < media.length(); i++) {
+                        //get photo url
+                        String mediaType = media.getJSONObject(i).getString("type");
+                        if (mediaType.equals("photo")) {
+                            tweet.mediaImageUrl = media.getJSONObject(i).getString("media_url");
+                        } else if (mediaType.equals("video")) {
+                            tweet.mediaImageUrl = media.getJSONObject(i).getString("media_url");
+                        }
                     }
                 }
-                //get photo url
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (java.text.ParseException e) {

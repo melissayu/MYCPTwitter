@@ -10,10 +10,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.mycptwitter.models.Tweet;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 /**
  * Created by melissa on 3/21/17.
@@ -49,7 +51,9 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet>{
         ivProfileImage.setImageResource(android.R.color.transparent); //clear out image
         tvTimestamp.setText(tweet.getRelativeTimestamp());
 
-        Picasso.with(getContext()).load(tweet.getUser().getProfileImageUrl()).into(ivProfileImage);
+        Glide.with(getContext()).load(tweet.getUser().getProfileImageUrl())
+                .bitmapTransform(new RoundedCornersTransformation(getContext(), 4, 0))
+                .into(ivProfileImage);
 
         return convertView;
     }
