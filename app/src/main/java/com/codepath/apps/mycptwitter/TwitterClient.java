@@ -34,18 +34,6 @@ public class TwitterClient extends OAuthBaseClient {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
-	// CHANGE THIS
-	// DEFINE METHODS for different API endpoints here
-	public void getInterestingnessList(AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("?nojsoncallback=1&method=flickr.interestingness.getList");
-		// Can specify query string params directly or through RequestParams.
-		RequestParams params = new RequestParams();
-		params.put("format", "json");
-		client.get(apiUrl, params, handler);
-	}
-
-	//METHOD == ENDPOINT
-
     //Home - Timeline: gets timeline
 //    GET statuses/home_timeline.json
 //        count=25
@@ -64,14 +52,40 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     //Compose Tweet
-	public void postTweet(String statusText, AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/update.json");
+    public void postTweet(String statusText, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/update.json");
         RequestParams params = new RequestParams();
         params.put("status", statusText);
 
         getClient().post(apiUrl, params, handler);
 
-	}
+    }
+
+    public void getUserTimeline(String screenName, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", 25);
+        params.put("screen_name", screenName);
+        //Execute request
+        getClient().get(apiUrl, params, handler);
+
+    }
+    public void getUserInfo(AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("account/verify_credentials.json");
+        //Execute request
+        getClient().get(apiUrl, null, handler);
+
+    }
+
+
+    public void getMentionsTimeline(AsyncHttpResponseHandler handler){
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", 25);
+        //Execute request
+        getClient().get(apiUrl, params, handler);
+    }
+
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
 	 * 	  i.e getApiUrl("statuses/home_timeline.json");

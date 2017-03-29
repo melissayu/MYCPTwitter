@@ -43,7 +43,6 @@ public class TweetDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_detail);
 
-//        tweet = getIntent().getStringExtra("username");
         tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
         setupViews();
@@ -113,7 +112,6 @@ public class TweetDetailActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int charCount = 140-s.length();
                 tvCharCount.setText(Integer.toString(charCount));
-//                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
             }
 
             @Override

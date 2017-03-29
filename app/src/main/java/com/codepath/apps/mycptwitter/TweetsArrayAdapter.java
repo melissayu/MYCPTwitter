@@ -31,19 +31,15 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet>{
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-//        return super.getView(position, convertView, parent);
-
         Tweet tweet =  getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_tweet, parent, false);
-
         }
 
         ImageView ivProfileImage = (ImageView) convertView.findViewById(R.id.ivProfileImage);
         TextView tvUserName = (TextView) convertView.findViewById(R.id.tvUserNameCompose);
         LinkifiedTextView tvBody = (LinkifiedTextView) convertView.findViewById(R.id.tvBody);
-//        TextView tvBody = (TextView) convertView.findViewById(R.id.tvBody);
         TextView tvTimestamp = (TextView) convertView.findViewById(R.id.tvTimestamp);
 
         tvUserName.setText(tweet.getUser().getName());
