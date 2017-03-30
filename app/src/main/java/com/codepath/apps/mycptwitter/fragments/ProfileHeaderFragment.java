@@ -21,6 +21,12 @@ import org.parceler.Parcels;
 
 public class ProfileHeaderFragment extends Fragment {
 
+    TextView tvNameProfile;
+    TextView tvTaglineProfile;
+    TextView tvFollowersCount;
+    TextView tvFollowingCount;
+    ImageView ivImageProfile;
+
     User user;
 
     public static ProfileHeaderFragment newInstance(User user) {
@@ -43,11 +49,15 @@ public class ProfileHeaderFragment extends Fragment {
 //        return super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_profile_header, parent, false);
 
-//        TextView tvNameProfile = (TextView) v.findViewById(R.id.tvNameProfile);
-//        TextView tvTaglineProfile = (TextView) v.findViewById(R.id.tvTaglineProfile);
-//        TextView tvFollowersCount = (TextView) v.findViewById(R.id.tvFollowers);
-//        TextView tvFollowingCount = (TextView) v.findViewById(R.id.tvFollowing);
-//        ImageView ivImageProfile = (ImageView) v.findViewById(R.id.ivImageProfile);
+        tvNameProfile = (TextView) v.findViewById(R.id.tvNameProfile);
+        tvTaglineProfile = (TextView) v.findViewById(R.id.tvTaglineProfile);
+        tvFollowersCount = (TextView) v.findViewById(R.id.tvFollowers);
+        tvFollowingCount = (TextView) v.findViewById(R.id.tvFollowing);
+        ivImageProfile = (ImageView) v.findViewById(R.id.ivImageProfile);
+
+        if (user != null) {
+            populateHeader(user);
+        }
 //
 //        tvNameProfile.setText(user.getName());
 //        tvTaglineProfile.setText(user.getTagline());
@@ -62,11 +72,11 @@ public class ProfileHeaderFragment extends Fragment {
 
     public void populateHeader(User user) {
 
-        TextView tvNameProfile = (TextView) getActivity().findViewById(R.id.tvNameProfile);
-        TextView tvTaglineProfile = (TextView) getActivity().findViewById(R.id.tvTaglineProfile);
-        TextView tvFollowersCount = (TextView) getActivity().findViewById(R.id.tvFollowers);
-        TextView tvFollowingCount = (TextView) getActivity().findViewById(R.id.tvFollowing);
-        ImageView ivImageProfile = (ImageView) getActivity().findViewById(R.id.ivImageProfile);
+//        TextView tvNameProfile = (TextView) getContext().findViewById(R.id.tvNameProfile);
+//        TextView tvTaglineProfile = (TextView) getActivity().findViewById(R.id.tvTaglineProfile);
+//        TextView tvFollowersCount = (TextView) getActivity().findViewById(R.id.tvFollowers);
+//        TextView tvFollowingCount = (TextView) getActivity().findViewById(R.id.tvFollowing);
+//        ImageView ivImageProfile = (ImageView) getActivity().findViewById(R.id.ivImageProfile);
 
         tvNameProfile.setText(user.getName());
         tvTaglineProfile.setText(user.getTagline());

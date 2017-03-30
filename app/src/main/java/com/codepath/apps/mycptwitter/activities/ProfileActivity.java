@@ -13,6 +13,7 @@ import com.codepath.apps.mycptwitter.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -25,22 +26,28 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        client = TwitterApplication.getRestClient(); //singleton client
-        client.getUserInfo(new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+        user = (User) Parcels.unwrap(getIntent().getParcelableExtra("user"));
+        String screenName = null;
+        if(user != null) {
+            screenName = user.getScreenName();
+        }
+
+        if (user == null){
+            client = TwitterApplication.getRestClient(); //singleton client
+            client.getUserInfo(new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 //                super.onSuccess(statusCode, headers, response);
-                user = User.fromJSON(response);
-                getSupportActionBar().setTitle(user.getScreenName());
-                ProfileHeaderFragment profileHeaderFragment = (ProfileHeaderFragment)
-                        getSupportFragmentManager().findFragmentByTag("PROFILE_HEADER");
-                profileHeaderFragment.populateHeader(user);
-            }
-        });
+                    user = User.fromJSON(response);
+                    getSupportActionBar().setTitle(user.getScreenName());
+                    ProfileHeaderFragment profileHeaderFragment = (ProfileHeaderFragment)
+                            getSupportFragmentManager().findFragmentByTag("PROFILE_HEADER");
+                    profileHeaderFragment.populateHeader(user);
+                }
+            });
+        }
 
-        String screenName = getIntent().getStringExtra("screen_name");
-
-
+        //        String screenName = getIntent().getStringExtra("screen_name");
         if (savedInstanceState == null) {
             UserTimelineFragment userTimelineFragment = UserTimelineFragment.newInstance(screenName);
             ProfileHeaderFragment profileHeaderFragment = ProfileHeaderFragment.newInstance(user);

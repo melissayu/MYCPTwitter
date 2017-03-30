@@ -66,6 +66,16 @@ public class TweetDetailActivity extends AppCompatActivity {
         Glide.with(getContext()).load(tweet.getMediaImageUrl())
                 .into(ivMediaPic);
 
+        ivProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), ProfileActivity.class);
+                i.putExtra("user", Parcels.wrap(tweet.getUser()));
+                startActivity(i);
+
+            }
+        });
+
     }
 
     @Override
