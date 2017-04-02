@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.mycptwitter.models.Tweet;
+import com.codepath.apps.mycptwitter.models.User;
 
 import java.util.List;
 
@@ -22,16 +23,27 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
  */
 
 public class TweetsArrayAdapter extends ArrayAdapter<Tweet>{
+    private OnProfilePhotoClickedListener listener;
+    private Context context;
 
+    public interface OnProfilePhotoClickedListener {
+        void onPhotoClicked(User user);
+    }
+
+//    public void setCustomObjectListener(OnProfilePhotoClickedListener listener) {
+//        this.listener = listener;
+//    }
 
     public TweetsArrayAdapter( Context context, List<Tweet> tweets) {
         super(context, android.R.layout.simple_list_item_1, tweets);
+        this.listener = null;
+        this.context = context;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Tweet tweet =  getItem(position);
+        final Tweet tweet =  getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_tweet, parent, false);
@@ -50,6 +62,27 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet>{
         Glide.with(getContext()).load(tweet.getUser().getProfileImageUrl())
                 .bitmapTransform(new RoundedCornersTransformation(getContext(), 4, 0))
                 .into(ivProfileImage);
+
+        final ViewGroup parentActivity = parent;
+
+        ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OnProfilePhotoClickedListener listener = (OnProfilePhotoClickedListener) context;
+                listener.onPhotoClicked(tweet.getUser());
+            }
+        });
+
+//        ivProfileImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent i = new Intent(getContext(), ProfileActivity.class);
+//                i.putExtra("user", Parcels.wrap(tweet.getUser()));
+//                startActivity(i);
+//
+//            }
+//        });
+//
 
         return convertView;
     }

@@ -1,5 +1,6 @@
 package com.codepath.apps.mycptwitter.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,16 +10,25 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.codepath.apps.mycptwitter.R;
+import com.codepath.apps.mycptwitter.TweetsArrayAdapter;
+import com.codepath.apps.mycptwitter.fragments.ComposeDialogFragment;
 import com.codepath.apps.mycptwitter.fragments.HomeTimelineFragment;
 import com.codepath.apps.mycptwitter.fragments.MentionsTimelineFragment;
+import com.codepath.apps.mycptwitter.models.Tweet;
+import com.codepath.apps.mycptwitter.models.User;
 
-public class TimelineActivity extends AppCompatActivity {
+import org.parceler.Parcels;
+
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener, TweetsArrayAdapter.OnProfilePhotoClickedListener {
     private final int REQUEST_CODE = 20;
+    Dialog dialog;
 
-    private HomeTimelineFragment fragmentTweetsList;
+    private HomeTimelineFragment homeTimelineFragment;
+    private MentionsTimelineFragment mentionsTimelineFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +49,7 @@ public class TimelineActivity extends AppCompatActivity {
         getSupportActionBar().setLogo(R.drawable.ic_twitter_white);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
+
     }
 
     public void goToProfile(){
@@ -52,7 +63,7 @@ public class TimelineActivity extends AppCompatActivity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.miCompose:
-                fragmentTweetsList.goToCompose();
+                goToCompose();
                 return true;
             case R.id.miProfile:
                 goToProfile();
@@ -61,6 +72,53 @@ public class TimelineActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void goToCompose(){
+
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeDialogFragment composeDialogFragment = ComposeDialogFragment.newInstance("");
+        composeDialogFragment.show(fm, "fragment_edit_name");
+
+        /*        dialog = new Dialog(this);
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
+        dialog.setContentView(R.layout.dialog_compose);
+        dialog.setTitle("Compose new Tweet");
+
+        final TextView tvCharCount = (TextView) dialog.findViewById(R.id.tvCharCountDialog);
+
+        final EditText etTweet = (EditText) dialog.findViewById(R.id.etTweetBodyDialog);
+        etTweet.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int charCount = 140-s.length();
+                tvCharCount.setText(Integer.toString(charCount));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        Button btnPost = (Button) dialog.findViewById(R.id.btnSaveDialog);
+        btnPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tweetBody = etTweet.getText().toString();
+                postNewTweet(tweetBody);
+            }
+        });
+
+        dialog.show();
+        */
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -71,13 +129,33 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // REQUEST_CODE is defined above
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+        if (resultCode == RESULT_OK) {
             // Extract tweet body from result extras
-            String tweetBody = data.getExtras().getString("tweetBody");
+//            String tweetBody = data.getExtras().getString("tweetBody");
 
             //postTweet(tweetBody); TODO: MOVE THIS OUT OF HERE INTO FRAGMENT
 
+            Tweet newTweet = (Tweet) Parcels.unwrap(data.getExtras().getParcelable("tweet"));
+            if (homeTimelineFragment != null) {
+                homeTimelineFragment.newTweetComposed(newTweet);
+            }
+
         }
+    }
+
+    @Override
+    public void onFinishCompose(Tweet newTweet) {
+        if (homeTimelineFragment != null) {
+            homeTimelineFragment.newTweetComposed(newTweet);
+        }
+    }
+
+    @Override
+    public void onPhotoClicked(User user) {
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("user", Parcels.wrap(user));
+        startActivity(i);
+
     }
 
     //return order of the fragments in the viewpager
@@ -97,6 +175,21 @@ public class TimelineActivity extends AppCompatActivity {
             } else {
                 return null;
             }
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    homeTimelineFragment = (HomeTimelineFragment) createdFragment;
+                    break;
+                case 1:
+                    mentionsTimelineFragment = (MentionsTimelineFragment) createdFragment;
+                    break;
+            }
+            return createdFragment;
         }
 
         @Override

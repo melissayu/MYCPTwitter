@@ -30,6 +30,8 @@ public class ProfileActivity extends AppCompatActivity {
         String screenName = null;
         if(user != null) {
             screenName = user.getScreenName();
+            getSupportActionBar().setTitle(screenName);
+
         }
 
         if (user == null){

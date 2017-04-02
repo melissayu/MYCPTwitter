@@ -2,8 +2,13 @@ package com.codepath.apps.mycptwitter.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.codepath.apps.mycptwitter.EndlessScrollListener;
 import com.codepath.apps.mycptwitter.TwitterApplication;
 import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
@@ -30,6 +35,40 @@ public class MentionsTimelineFragment extends TweetsListFragment {
     long maxId;
     boolean firstLoad;
     boolean refreshAll;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup parent, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+
+        super.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //delete all tweets in db
+//                List<Tweet> dbTweets = SQLite.select()
+//                        .from(Tweet.class)
+//                        .queryList();
+//                for (int i=0; i< dbTweets.size(); i++) {
+//                    dbTweets.get(i).delete();
+//                }
+                maxId = 0;
+                firstLoad = false;
+                refreshAll = true;
+                populateTimeline();
+            }
+
+        });
+
+        super.lvTweets.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                populateTimeline();
+                return true;
+            }
+        });
+
+        return v;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,7 +98,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
             }
         }
 
-        client.getMentionsTimeline(new JsonHttpResponseHandler() {
+        client.getMentionsTimeline(maxId, new JsonHttpResponseHandler() {
             //success
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -89,7 +128,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
                 //Persist tweets in db
                 //persistTweets(fetchedTweets);
 
-                //swipeContainer.setRefreshing(false);
+                swipeContainer.setRefreshing(false);
 
             }
 

@@ -22,6 +22,7 @@ import org.parceler.Parcels;
 public class ProfileHeaderFragment extends Fragment {
 
     TextView tvNameProfile;
+    TextView tvScreenNameProfile;
     TextView tvTaglineProfile;
     TextView tvFollowersCount;
     TextView tvFollowingCount;
@@ -50,6 +51,7 @@ public class ProfileHeaderFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile_header, parent, false);
 
         tvNameProfile = (TextView) v.findViewById(R.id.tvNameProfile);
+        tvScreenNameProfile = (TextView) v.findViewById(R.id.tvScreenNameProfile);
         tvTaglineProfile = (TextView) v.findViewById(R.id.tvTaglineProfile);
         tvFollowersCount = (TextView) v.findViewById(R.id.tvFollowers);
         tvFollowingCount = (TextView) v.findViewById(R.id.tvFollowing);
@@ -79,6 +81,7 @@ public class ProfileHeaderFragment extends Fragment {
 //        ImageView ivImageProfile = (ImageView) getActivity().findViewById(R.id.ivImageProfile);
 
         tvNameProfile.setText(user.getName());
+        tvScreenNameProfile.setText(user.getScreenName());
         tvTaglineProfile.setText(user.getTagline());
         tvFollowersCount.setText(user.getFollowersCount() + " Followers");
         tvFollowingCount.setText(user.getFollowingCount() + " Following");

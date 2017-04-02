@@ -4,19 +4,12 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.codepath.apps.mycptwitter.EndlessScrollListener;
-import com.codepath.apps.mycptwitter.R;
 import com.codepath.apps.mycptwitter.TwitterApplication;
 import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
@@ -176,75 +169,7 @@ public class HomeTimelineFragment extends TweetsListFragment {
             }
         });
     }
-    public void goToCompose(){
-        dialog = new Dialog(getActivity());
 
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
-        dialog.setContentView(R.layout.dialog_compose);
-        dialog.setTitle("Compose new Tweet");
-
-        final TextView tvCharCount = (TextView) dialog.findViewById(R.id.tvCharCountDialog);
-
-        final EditText etTweet = (EditText) dialog.findViewById(R.id.etTweetBodyDialog);
-        etTweet.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int charCount = 140-s.length();
-                tvCharCount.setText(Integer.toString(charCount));
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        Button btnPost = (Button) dialog.findViewById(R.id.btnSaveDialog);
-        btnPost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tweetBody = etTweet.getText().toString();
-                postNewTweet(tweetBody);
-            }
-        });
-
-        dialog.show();
-    }
-
-    private void postNewTweet(String tweetBody) {
-        dialog.dismiss();
-        postTweet(tweetBody);
-    }
-
-    private void postTweet(String tweetBody){
-        client.postTweet(tweetBody, new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-                Log.d("DEBUG", response.toString());
-
-                Tweet newTweet = Tweet.fromJSON(response);
-
-                //add newTweet to list
-                getAdapter().insert(newTweet,0);
-                getAdapter().notifyDataSetChanged();
-
-                //persist new tweet
-                newTweet.save();
-                HomeTimelineFragment.super.lvTweets.setSelectionAfterHeaderView();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                Log.d("DEBUG", errorResponse.toString());
-            }
-        });
-    }
 
     private void persistTweets(ArrayList<Tweet> fetchedTweets) {
         for (int i = 0; i < fetchedTweets.size(); i++) {
@@ -255,5 +180,10 @@ public class HomeTimelineFragment extends TweetsListFragment {
         }
     }
 
+    public void newTweetComposed(Tweet newTweet) {
+        getAdapter().insert(newTweet,0);
+        getAdapter().notifyDataSetChanged();
+        lvTweets.setSelectionAfterHeaderView();
+    }
 
 }

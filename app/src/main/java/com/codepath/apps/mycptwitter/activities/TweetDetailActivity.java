@@ -3,20 +3,17 @@ package com.codepath.apps.mycptwitter.activities;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.mycptwitter.R;
+import com.codepath.apps.mycptwitter.fragments.ComposeDialogFragment;
 import com.codepath.apps.mycptwitter.models.Tweet;
 
 import org.parceler.Parcels;
@@ -25,7 +22,7 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 import static com.raizlabs.android.dbflow.config.FlowManager.getContext;
 
-public class TweetDetailActivity extends AppCompatActivity {
+public class TweetDetailActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener{
 
     Tweet tweet;
 
@@ -98,7 +95,12 @@ public class TweetDetailActivity extends AppCompatActivity {
     }
 
     private void composeReply(){
-        dialog = new Dialog(TweetDetailActivity.this);
+        FragmentManager fm = getSupportFragmentManager();
+        String atReply = tweet.getUser().getScreenName();
+        ComposeDialogFragment composeDialogFragment = ComposeDialogFragment.newInstance(atReply);
+        composeDialogFragment.show(fm, "fragment_edit_name");
+
+/*        dialog = new Dialog(TweetDetailActivity.this);
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
         dialog.setContentView(R.layout.dialog_compose);
@@ -140,17 +142,22 @@ public class TweetDetailActivity extends AppCompatActivity {
         });
 
         dialog.show();
+*/
     }
 
-    private void returnTweetBody() {
-        dialog.dismiss();
+    private void returnTweet(Tweet newTweet) {
+//        dialog.dismiss();
         Intent data = new Intent();
         // Pass relevant data back as a result
-        data.putExtra("tweetBody", tweetBody); // TODO: send back Tweet object
-
+//        data.putExtra("tweetBody", tweetBody); // TODO: send back Tweet object
+        data.putExtra("tweet", Parcels.wrap(newTweet));
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response
         finish(); // closes the activity, pass data to parent
     }
 
+    @Override
+    public void onFinishCompose(Tweet newTweet) {
+        returnTweet(newTweet);
+    }
 }

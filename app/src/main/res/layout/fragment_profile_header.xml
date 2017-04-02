@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -11,7 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:paddingBottom="10dp"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp"
+        android:paddingTop="22dp">
 
         <ImageView
             android:id="@+id/ivImageProfile"
@@ -20,28 +25,38 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginBottom="22dp"
-            android:layout_marginLeft="22dp"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="22dp"
+            android:layout_marginRight="10dp"
             app:srcCompat="@drawable/ic_launcher" />
 
         <TextView
             android:id="@+id/tvTaglineProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/ivImageProfile"
+            android:layout_marginTop="10dp"
+            android:autoLink="all"
+            android:linksClickable="true"
+            android:text="Tagline"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvScreenNameProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@id/ivImageProfile"
             android:layout_toRightOf="@id/ivImageProfile"
-            android:text="Tagline" />
+            android:text="\@name" />
 
         <TextView
             android:id="@+id/tvNameProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/tvTaglineProfile"
+            android:layout_above="@id/tvScreenNameProfile"
+            android:layout_marginBottom="2dp"
             android:layout_toRightOf="@id/ivImageProfile"
-            android:text="Name" />
-
+            android:text="Name"
+            android:textColor="@android:color/black"
+            android:textSize="18dp" />
 
     </RelativeLayout>
 
@@ -50,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rlUserHeader"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -68,5 +84,8 @@
 
     </LinearLayout>
 
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorPrimaryDark" />
 </LinearLayout>

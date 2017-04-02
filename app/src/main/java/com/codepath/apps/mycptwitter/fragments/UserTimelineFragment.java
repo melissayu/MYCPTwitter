@@ -2,21 +2,23 @@ package com.codepath.apps.mycptwitter.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.codepath.apps.mycptwitter.EndlessScrollListener;
 import com.codepath.apps.mycptwitter.TwitterApplication;
 import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
-import com.codepath.apps.mycptwitter.models.Tweet_Table;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -30,15 +32,81 @@ public class UserTimelineFragment extends TweetsListFragment {
     boolean firstLoad;
     boolean refreshAll;
 
+    @Nullable
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup parent, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+//        View v = inflater.inflate(R.layout.fragment_tweets_list, parent, false);
+
         client = TwitterApplication.getRestClient(); //singleton client
+
+        super.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //delete all tweets in db
+//                List<Tweet> dbTweets = SQLite.select()
+//                        .from(Tweet.class)
+//                        .queryList();
+//                for (int i=0; i< dbTweets.size(); i++) {
+//                    dbTweets.get(i).delete();
+//                }
+                maxId = 0;
+                firstLoad = false;
+                refreshAll = true;
+                populateTimeline();
+            }
+
+        });
+
+        super.lvTweets.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                populateTimeline();
+                return true;
+            }
+        });
 
         firstLoad = false;
         refreshAll = true;
         populateTimeline();
 
+        return v;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        client = TwitterApplication.getRestClient(); //singleton client
+/*
+        super.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //delete all tweets in db
+//                List<Tweet> dbTweets = SQLite.select()
+//                        .from(Tweet.class)
+//                        .queryList();
+//                for (int i=0; i< dbTweets.size(); i++) {
+//                    dbTweets.get(i).delete();
+//                }
+                firstLoad = false;
+                refreshAll = true;
+                populateTimeline();
+            }
+
+        });
+
+        super.lvTweets.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                populateTimeline();
+                return true;
+            }
+        });
+
+        firstLoad = false;
+        refreshAll = true;
+        populateTimeline();
+*/
     }
 
     public static UserTimelineFragment newInstance(String screenName) {
@@ -53,21 +121,21 @@ public class UserTimelineFragment extends TweetsListFragment {
     private void populateTimeline(){
         String screenName = getArguments().getString("screen_name");
         //if first time loading, populate list from db
-        if (firstLoad) {
-            List<Tweet> dbTweets = SQLite.select()
-                    .from(Tweet.class)
-                    .orderBy(Tweet_Table.uid, false)
-                    .queryList();
-            if (dbTweets.size() > 0) {
-                addAll(dbTweets);
-                firstLoad = false;
-                refreshAll = false;
-                maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
-                return;
-            }
-        }
+//        if (firstLoad) {
+//            List<Tweet> dbTweets = SQLite.select()
+//                    .from(Tweet.class)
+//                    .orderBy(Tweet_Table.uid, false)
+//                    .queryList();
+//            if (dbTweets.size() > 0) {
+//                addAll(dbTweets);
+//                firstLoad = false;
+//                refreshAll = false;
+//                maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
+//                return;
+//            }
+//        }
 
-        client.getUserTimeline(screenName, new JsonHttpResponseHandler() {
+        client.getUserTimeline(screenName, maxId, new JsonHttpResponseHandler() {
             //success
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -97,7 +165,7 @@ public class UserTimelineFragment extends TweetsListFragment {
                 //Persist tweets in db
                 //persistTweets(fetchedTweets);
 
-                //swipeContainer.setRefreshing(false);
+                swipeContainer.setRefreshing(false);
 
             }
 
