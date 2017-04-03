@@ -1,13 +1,17 @@
 package com.codepath.apps.mycptwitter.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.codepath.apps.mycptwitter.R;
 import com.codepath.apps.mycptwitter.TwitterApplication;
 import com.codepath.apps.mycptwitter.TwitterClient;
+import com.codepath.apps.mycptwitter.fragments.ComposeDialogFragment;
 import com.codepath.apps.mycptwitter.fragments.ProfileHeaderFragment;
 import com.codepath.apps.mycptwitter.fragments.UserTimelineFragment;
 import com.codepath.apps.mycptwitter.models.User;
@@ -71,5 +75,35 @@ public class ProfileActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.miCompose:
+                goToCompose();
+                return true;
+            case R.id.miProfile:
+                goToProfile();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void goToCompose() {
+
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeDialogFragment composeDialogFragment = ComposeDialogFragment.newInstance("");
+        composeDialogFragment.show(fm, "fragment_edit_name");
+
+    }
+
+    public void goToProfile(){
+        Intent i = new Intent(this, ProfileActivity.class);
+        startActivity(i);
+
+    }
+
 
 }
