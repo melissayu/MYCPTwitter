@@ -1,6 +1,8 @@
 package com.codepath.apps.mycptwitter;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -30,7 +32,14 @@ public class TwitterClient extends OAuthBaseClient {
 
     public int maxId;
 
-	public TwitterClient(Context context) {
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) TwitterApplication.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
@@ -39,57 +48,64 @@ public class TwitterClient extends OAuthBaseClient {
 //        count=25
 //        since_id=1
     public void getHomeTimeline(Boolean firstLoad, long maxId, AsyncHttpResponseHandler handler){
-        String apiUrl = getApiUrl("statuses/home_timeline.json");
-        RequestParams params = new RequestParams();
-        params.put("count", 25);
-        params.put("since_id", 1);
-        if (!firstLoad) {
-            params.put("max_id", maxId);
-        }
+        if (isNetworkAvailable()) {
+            String apiUrl = getApiUrl("statuses/home_timeline.json");
+            RequestParams params = new RequestParams();
+            params.put("count", 25);
+            params.put("since_id", 1);
+            if (!firstLoad) {
+                params.put("max_id", maxId);
+            }
 
-        //Execute request
-        getClient().get(apiUrl, params, handler);
+            //Execute request
+            getClient().get(apiUrl, params, handler);
+        }
     }
 
     //Compose Tweet
     public void postTweet(String statusText, AsyncHttpResponseHandler handler) {
-        String apiUrl = getApiUrl("statuses/update.json");
-        RequestParams params = new RequestParams();
-        params.put("status", statusText);
+        if (isNetworkAvailable()) {
+            String apiUrl = getApiUrl("statuses/update.json");
+            RequestParams params = new RequestParams();
+            params.put("status", statusText);
 
-        getClient().post(apiUrl, params, handler);
-
+            getClient().post(apiUrl, params, handler);
+        }
     }
 
     public void getUserTimeline(String screenName, long maxId, AsyncHttpResponseHandler handler) {
-        String apiUrl = getApiUrl("statuses/user_timeline.json");
-        RequestParams params = new RequestParams();
-        params.put("count", 25);
-        params.put("screen_name", screenName);
-        if (maxId > 0) {
-            params.put("max_id", maxId);
+        if (isNetworkAvailable()) {
+            String apiUrl = getApiUrl("statuses/user_timeline.json");
+            RequestParams params = new RequestParams();
+            params.put("count", 25);
+            params.put("screen_name", screenName);
+            if (maxId > 0) {
+                params.put("max_id", maxId);
+            }
+            //Execute request
+            getClient().get(apiUrl, params, handler);
         }
-        //Execute request
-        getClient().get(apiUrl, params, handler);
-
     }
     public void getUserInfo(AsyncHttpResponseHandler handler) {
-        String apiUrl = getApiUrl("account/verify_credentials.json");
-        //Execute request
-        getClient().get(apiUrl, null, handler);
-
+        if (isNetworkAvailable()) {
+            String apiUrl = getApiUrl("account/verify_credentials.json");
+            //Execute request
+            getClient().get(apiUrl, null, handler);
+        }
     }
 
 
     public void getMentionsTimeline(long maxId, AsyncHttpResponseHandler handler){
-        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
-        RequestParams params = new RequestParams();
-        params.put("count", 25);
-        if (maxId > 0) {
-            params.put("max_id", maxId);
+        if (isNetworkAvailable()) {
+            String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+            RequestParams params = new RequestParams();
+            params.put("count", 25);
+            if (maxId > 0) {
+                params.put("max_id", maxId);
+            }
+            //Execute request
+            getClient().get(apiUrl, params, handler);
         }
-        //Execute request
-        getClient().get(apiUrl, params, handler);
     }
 
 

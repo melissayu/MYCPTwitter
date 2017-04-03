@@ -40,8 +40,11 @@ public class TweetDetailActivity extends AppCompatActivity implements ComposeDia
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_detail);
 
-        tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_twitter_white);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
+        tweet = (Tweet) Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
         setupViews();
 
     }

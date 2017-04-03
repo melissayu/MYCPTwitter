@@ -3,6 +3,7 @@ package com.codepath.apps.mycptwitter.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 
 import com.codepath.apps.mycptwitter.R;
 import com.codepath.apps.mycptwitter.TwitterApplication;
@@ -25,6 +26,10 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.ic_twitter_white);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         user = (User) Parcels.unwrap(getIntent().getParcelableExtra("user"));
         String screenName = null;
@@ -58,6 +63,13 @@ public class ProfileActivity extends AppCompatActivity {
             ft.replace(R.id.flHeaderContainer, profileHeaderFragment, "PROFILE_HEADER");
             ft.commit();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
 }

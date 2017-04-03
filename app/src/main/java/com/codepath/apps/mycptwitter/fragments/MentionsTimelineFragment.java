@@ -12,16 +12,13 @@ import com.codepath.apps.mycptwitter.EndlessScrollListener;
 import com.codepath.apps.mycptwitter.TwitterApplication;
 import com.codepath.apps.mycptwitter.TwitterClient;
 import com.codepath.apps.mycptwitter.models.Tweet;
-import com.codepath.apps.mycptwitter.models.Tweet_Table;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -83,20 +80,24 @@ public class MentionsTimelineFragment extends TweetsListFragment {
 
     //send api request and fill listview by creating tweet objects from json
     private void populateTimeline(){
+        super.showProgressBar();
+
         //if first time loading, populate list from db
-        if (firstLoad) {
-            List<Tweet> dbTweets = SQLite.select()
-                    .from(Tweet.class)
-                    .orderBy(Tweet_Table.uid, false)
-                    .queryList();
-            if (dbTweets.size() > 0) {
-                addAll(dbTweets);
-                firstLoad = false;
-                refreshAll = false;
-                maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
-                return;
-            }
-        }
+//        if (firstLoad) {
+//            List<Tweet> dbTweets = SQLite.select()
+//                    .from(Tweet.class)
+//                    .orderBy(Tweet_Table.uid, false)
+//                    .queryList();
+//            if (dbTweets.size() > 0) {
+//                addAll(dbTweets);
+//                firstLoad = false;
+//                refreshAll = false;
+//                maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
+//                super.hideProgressBar();
+//
+//                return;
+//            }
+//        }
 
         client.getMentionsTimeline(maxId, new JsonHttpResponseHandler() {
             //success
@@ -127,7 +128,7 @@ public class MentionsTimelineFragment extends TweetsListFragment {
 
                 //Persist tweets in db
                 //persistTweets(fetchedTweets);
-
+                MentionsTimelineFragment.super.hideProgressBar();
                 swipeContainer.setRefreshing(false);
 
             }

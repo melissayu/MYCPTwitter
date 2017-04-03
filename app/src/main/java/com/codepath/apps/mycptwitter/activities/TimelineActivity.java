@@ -58,6 +58,16 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
     }
 
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        // Store instance of the menu item containing progress
+//        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+//        // Extract the action-view from the menu item
+//        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgressItem);
+//
+//        return super.onPrepareOptionsMenu(menu);
+//    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items

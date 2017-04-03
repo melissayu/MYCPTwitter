@@ -108,6 +108,7 @@ public class HomeTimelineFragment extends TweetsListFragment {
 
     //send api request and fill listview by creating tweet objects from json
     private void populateTimeline(){
+        super.showProgressBar();
         //if first time loading, populate list from db
         if (firstLoad) {
             List<Tweet> dbTweets = SQLite.select()
@@ -119,6 +120,7 @@ public class HomeTimelineFragment extends TweetsListFragment {
                 firstLoad = false;
                 refreshAll = false;
                 maxId = dbTweets.get(dbTweets.size()-1).getUid()-1;
+                super.hideProgressBar();
                 return;
             }
         }
@@ -154,6 +156,7 @@ public class HomeTimelineFragment extends TweetsListFragment {
                 persistTweets(fetchedTweets);
 
                 swipeContainer.setRefreshing(false);
+                HomeTimelineFragment.super.hideProgressBar();
 
             }
 

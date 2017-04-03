@@ -119,6 +119,7 @@ public class UserTimelineFragment extends TweetsListFragment {
 
     //send api request and fill listview by creating tweet objects from json
     private void populateTimeline(){
+        super.showProgressBar();
         String screenName = getArguments().getString("screen_name");
         //if first time loading, populate list from db
 //        if (firstLoad) {
@@ -164,7 +165,7 @@ public class UserTimelineFragment extends TweetsListFragment {
 
                 //Persist tweets in db
                 //persistTweets(fetchedTweets);
-
+                UserTimelineFragment.super.hideProgressBar();
                 swipeContainer.setRefreshing(false);
 
             }

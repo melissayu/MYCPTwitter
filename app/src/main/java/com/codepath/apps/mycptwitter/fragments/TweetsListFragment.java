@@ -1,15 +1,23 @@
 package com.codepath.apps.mycptwitter.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.codepath.apps.mycptwitter.R;
 import com.codepath.apps.mycptwitter.TweetsArrayAdapter;
@@ -29,10 +37,19 @@ public class TweetsListFragment extends Fragment{
     private final int REQUEST_CODE = 20;
 
     public SwipeRefreshLayout swipeContainer;
+    MenuItem miActionProgressItem;
 
     private TweetsArrayAdapter aTweets;
     private ArrayList<Tweet> tweets;
     public ListView lvTweets;
+
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
 
     @Nullable
     @Override
@@ -86,10 +103,62 @@ public class TweetsListFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        if (!isNetworkAvailable()) {
+            Toast.makeText(getContext(), "Network Unavailable. Cannot refresh timeline", Toast.LENGTH_LONG).show();
+        }
 
         tweets = new ArrayList<>();
         aTweets = new TweetsArrayAdapter(getActivity(), tweets);
     }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        // Extract the action-view from the menu item
+        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgressItem);
+        // Return to finish
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        if (miActionProgressItem!=null) {
+            miActionProgressItem.setVisible(true);
+        }
+    }
+
+    public void hideProgressBar() {
+
+        // Hide progress item
+        if (miActionProgressItem != null) {
+            miActionProgressItem.setVisible(false);
+
+        }
+    }
+    //    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        // Do something that differs the Activity's menu here
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.miCompose:
+//                // Not implemented here
+//                return false;
+//            case R.id.miProfile:
+//                // Do Fragment menu item stuff here
+//                return true;
+//            default:
+//                break;
+//        }
+//
+//        return false;
+//    }
 
     public TweetsArrayAdapter getAdapter() {
         return aTweets;
